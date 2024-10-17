@@ -46,7 +46,7 @@ def msd_calc_1d(pos_arr, n_frames, px2um, d_px2um):
 	buffer = pos_arr[:n_frames]
 	add = 0.0
 	for pos in pos_arr[n_frames:]:
-		add += np.square(pos - buffer[0]) 
+		add += (pos - buffer[0])**2
 		buffer = np.vstack((buffer[1:], pos))
 	msd = px2um**2 * add / (len(pos_arr) - n_frames)
 	return msd[0], (d_px2um*(8*msd)**0.5)[0]
@@ -140,7 +140,7 @@ class dataset:
 				for line in file:
 					line = line.strip("\n").split("\t")
 					try:
-						if int(line[0]) == indices[0] and int(line[1]) == indices[1] and int(line[3]) == indices[2] and int(line[6]) == indices[3] and 0 <= indices[4] < int(line[11]):
+						if int(line[0]) == indices[0] and int(line[1]) == indices[1] and int(line[3]) == indices[2] and int(line[6]) == indices[3] and 0 <= indices[4] <= int(line[11]):
 							self.sphere_diameter = float(line[2])
 							self.sphere_volume = float(line[4])
 							self.water_volume = float(line[5])
