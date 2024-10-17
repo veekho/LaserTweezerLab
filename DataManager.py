@@ -2,7 +2,7 @@ import os
 import numpy as np
 
 dir_data = "C:\\Users\\veerk\\source\\repos\\LaserTweezers\\dataFiles"
-exp_config = os.getcwd()+"\\experimentConfig.txt"
+exp_config = "C:\\Users\\veerk\\source\\repos\\LaserTweezers\\LaserTweezerLab\\experimentConfig.txt"
 
 def chi_square(true_val, test_val, std):
 	return np.sum(np.square((test_val - true_val)/std))
