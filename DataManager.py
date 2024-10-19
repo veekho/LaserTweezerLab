@@ -67,6 +67,8 @@ class dataset:
 		self.exposure = 0.0 #ms
 		self.px2um = 0.0 #um
 		self.d_px2um = 0.0 #um
+		self.laser_current = 0.0 #mA
+		self.particles_tracked = 0
 
 		self.x_pos = np.zeros((0,1))
 		self.y_pos = np.zeros((0,1))
@@ -81,7 +83,7 @@ class dataset:
 
 		self.valid_instance = True
 		
-		if type(day_index) != int or type(sphere_index) != int or type(conc_index) != int or type(rec_index) != int or type(particle_no) != int or type(fname) != str:
+		if type(day_index) != int or type(sphere_index) != int or type(conc_index) != int or type(rec_index) != int or type(fname) != str:
 			self.valid_instance = False
 			raise datasetError("Incorrectly formatted dataset parameters")
 
@@ -91,7 +93,7 @@ class dataset:
 				for line in file:
 					line = line.strip("\n").split("\t")
 					try:
-						if int(line[0]) == day_index and int(line[1]) == sphere_index and int(line[3]) == conc_index and int(line[6]) == rec_index and 0 <= particle_no < int(line[11]):
+						if int(line[0]) == day_index and int(line[1]) == sphere_index and int(line[3]) == conc_index and int(line[6]) == rec_index:
 							self.sphere_diameter = float(line[2])
 							self.sphere_volume = float(line[4])
 							self.water_volume = float(line[5])
@@ -108,14 +110,21 @@ class dataset:
 					raise datasetError("Inputted indices do not match any dataset, try specifying by filename")
 			
 			self.file = f"test{day_index}_{sphere_index}_{conc_index}_{rec_index}_Camera_tr_Track"
-			if particle_no>0:
-				self.file += f".{particle_no:03d}"
-			self.file+=".csv"
+			files_from_rec = []
+			for file in os.listdir(dir_data):
+				if file.split(".")[0] == self.file:
+					files_from_rec.append(file)
+			self.particles_tracked = len(files_from_rec = [])
 
-			os.chdir(dir_data)
-			if not os.path.isfile(self.file):
+			if particle_no<self.particles_tracked:
+				self.file = files_from_rec[particle_no]
+			else:
 				self.valid_instance = False
-				raise datasetError(f"File under name \'{self.file}' can not be found")
+				if self.particles_tracked == 0:
+					raise datasetError(f"No data files found in directory: {dir_data}")
+				else:
+					raise datasetError(f"Recording does not track more than {self.particles_tracked} particles; asked for more than that")
+
 		else:
 			#Test filename, throw error if invalid, otherwise retrieve metadata from config file, throw error if not logged
 			if fname == fname.strip(".csv"):
@@ -127,6 +136,9 @@ class dataset:
 			if not os.path.isfile(self.file):
 				self.valid_instance = False
 				raise datasetError(f"File ({self.file}) could not be found in data directory ({dir_data})")
+			for file in os.listdir(dir_data):
+				if file.split(".")[0] == fname.split(".")[0]:
+					self.particles_tracked+=1
 			
 			indices = [] #Day, Sphere index, Concentration index, Recording index, Particle in recording
 			for i in fname.lstrip("test").split("_")[:-3]:
@@ -140,7 +152,7 @@ class dataset:
 				for line in file:
 					line = line.strip("\n").split("\t")
 					try:
-						if int(line[0]) == indices[0] and int(line[1]) == indices[1] and int(line[3]) == indices[2] and int(line[6]) == indices[3] and 0 <= indices[4] <= int(line[11]):
+						if int(line[0]) == indices[0] and int(line[1]) == indices[1] and int(line[3]) == indices[2] and int(line[6]) == indices[3]:
 							self.sphere_diameter = float(line[2])
 							self.sphere_volume = float(line[4])
 							self.water_volume = float(line[5])
