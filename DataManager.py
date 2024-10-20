@@ -57,7 +57,7 @@ class datasetError(Exception):
 		super().__init__(self.message)
 
 class dataset:
-	def __init__(self, day_index=0, sphere_index=0, conc_index=0, rec_index=0, particle_no=0, fname='filename'):
+	def __init__(self, day_index=0, sphere_index=0, conc_index=0, rec_index=0, particle_index=0, fname='filename'):
 		self.file = fname
 		self.sphere_diameter = 0.0 #um
 		self.sphere_volume = 0.0 #uL
@@ -100,8 +100,9 @@ class dataset:
 							self.roi = [int(line[7]), int(line[8])]
 							self.fps = float(line[9])
 							self.exposure = float(line[10])
-							self.px2um = float(line[12])
-							self.d_px2um = float(line[13])
+							self.px2um = float(line[11])
+							self.d_px2um = float(line[12])
+							self.laser_current = float(line[13])
 							break
 					except (ValueError, TypeError):
 						pass
@@ -116,8 +117,8 @@ class dataset:
 					files_from_rec.append(file)
 			self.particles_tracked = len(files_from_rec = [])
 
-			if particle_no<self.particles_tracked:
-				self.file = files_from_rec[particle_no]
+			if particle_index<self.particles_tracked:
+				self.file = files_from_rec[particle_index-1]
 			else:
 				self.valid_instance = False
 				if self.particles_tracked == 0:
@@ -159,8 +160,9 @@ class dataset:
 							self.roi = [int(line[7]), int(line[8])]
 							self.fps = float(line[9])
 							self.exposure = float(line[10])
-							self.px2um = float(line[12])
-							self.d_px2um = float(line[13])
+							self.px2um = float(line[11])
+							self.d_px2um = float(line[12])
+							self.laser_current = float(line[13])
 							break
 					except (ValueError, TypeError):
 						pass
@@ -201,7 +203,7 @@ class dataset:
 			bin_edges = px2um*bin_edges
 			return histo, bin_edges
 		'''
-	def cumulative_travel(self, n, axis = "x"):
+	def cumulative_travel(self, n, axis):
 		if axis == "X" or axis == "x":
 			self.cumulative_distance, self.cumulative_time = cumulative_travel_1d(self.x_pos, n, self.fps)
 		elif axis == "Y" or axis == "y":
