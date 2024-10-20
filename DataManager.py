@@ -30,14 +30,14 @@ def msd_histo_1d(pos_arr, n_frames, px2um):
 	bin_edges = midbin(px2um*bin_edges)
 	return histo, bin_edges
 
-def cumulative_travel_1d(pos_arr, n_frames, fps):
+def cumulative_travel_1d(pos_arr, n_frames, fps, px2um):
 	#Outputs cumulative travel distance and time; note that uncertainty in the nth cumulative distance = sqrt(n)*(error in one position measurement) 
 	buffer = pos_arr[:n_frames]
 	dist_arr = np.zeros((1,1))
 	for pos in pos_arr[n_frames:]:
 		dist_arr = np.append(dist_arr, dist_arr[-1]+abs(pos - buffer[0]))
 		buffer = np.append(buffer[1:], pos)
-	dist_arr = dist_arr[1:]
+	dist_arr = dist_arr[1:]*px2um
 	time_arr = np.linspace(0, len(dist_arr)-1, len(dist_arr))/fps
 	return dist_arr, time_arr
 
@@ -205,16 +205,16 @@ class dataset:
 		'''
 	def cumulative_travel(self, n, axis):
 		if axis == "X" or axis == "x":
-			self.cumulative_distance, self.cumulative_time = cumulative_travel_1d(self.x_pos, n, self.fps)
+			self.cumulative_distance, self.cumulative_time = cumulative_travel_1d(self.x_pos, n, self.fps, self.px2um)
 		elif axis == "Y" or axis == "y":
-			self.cumulative_distance, self.cumulative_time = cumulative_travel_1d(self.y_pos, n, self.fps)
+			self.cumulative_distance, self.cumulative_time = cumulative_travel_1d(self.y_pos, n, self.fps, self.px2um)
 		else:
 			x_buffer, y_buffer = self.x_pos[:n], self.y_pos[:n]
 			dist_arr = np.zeros((1,1))
 			for x_pos, y_pos in zip(self.x_pos[n:], self.y_pos[n:]):
 				dist_arr = np.append(dist_arr, dist_arr[-1]+np.sqrt(np.square(x_pos - x_buffer[0])+np.square(y_pos - y_buffer[0])))
 				x_buffer, y_buffer = np.append(x_buffer[:1], x_pos), np.append(y_buffer[:1], y_pos)
-			self.cumulative_distance = dist_arr[1:]
+			self.cumulative_distance = dist_arr[1:]*self.px2um
 			self.cumulative_time = np.linspace(0, len(dist_arr)-1, len(dist_arr))/self.fps
 
 	def msd_calc(self, n, axis = 'x'):
