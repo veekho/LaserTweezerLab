@@ -115,7 +115,7 @@ class dataset:
 			for file in os.listdir(dir_data):
 				if file.split(".")[0] == self.file:
 					files_from_rec.append(file)
-			self.particles_tracked = len(files_from_rec = [])
+			self.particles_tracked = len(files_from_rec)
 
 			if particle_index<self.particles_tracked:
 				self.file = files_from_rec[particle_index-1]
