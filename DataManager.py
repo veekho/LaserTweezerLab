@@ -49,7 +49,7 @@ def msd_calc_1d(pos_arr, n_frames, px2um, d_px2um):
 		add += (pos - buffer[0])**2
 		buffer = np.vstack((buffer[1:], pos))
 	msd = px2um**2 * add / (len(pos_arr) - n_frames)
-	return msd[0], (d_px2um*(8*msd)**0.5)[0]
+	return msd[0], np.sqrt(d_px2um*(8*msd))[0]
 
 class datasetError(Exception):
 	def __init__(self, msg):
