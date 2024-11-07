@@ -216,7 +216,7 @@ class dataset:
 				dist_arr = np.append(dist_arr, dist_arr[-1]+np.sqrt(np.square(x_pos - x_buffer[0])+np.square(y_pos - y_buffer[0])))
 				x_buffer, y_buffer = np.append(x_buffer[:1], x_pos), np.append(y_buffer[:1], y_pos)
 			self.cumulative_distance = dist_arr[1:]*self.px2um
-			self.cumulative_time = np.linspace(0, len(dist_arr)-1, len(dist_arr))/self.fps
+			self.cumulative_time = np.linspace(0, len(self.cumulative_distance)-1, len(self.cumulative_distance))/self.fps
 
 	def msd_calc(self, n, axis):
 		if axis == 'X' or axis == 'x':
