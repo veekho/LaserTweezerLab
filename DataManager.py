@@ -47,10 +47,11 @@ def msd_calc_1d(pos_arr, n_frames, px2um, d_px2um):
 	add = 0.0
 	for pos in pos_arr[n_frames:]:
 		add += (pos - buffer[0])**2
-		buffer = np.vstack((buffer[1:], pos))
+		buffer = np.append(buffer[1:], pos)
 	msd = px2um**2 * add / (len(pos_arr) - n_frames)
-	return msd[0], d_px2um*np.sqrt((8*msd)/(len(pos_arr) - n_frames))[0]
-	#return msd[0], np.sqrt(d_px2um*(8*msd))[0]
+	#return msd[0], d_px2um*np.sqrt((8*msd)/(len(pos_arr) - n_frames))[0]
+	#msd = msd[0]
+	return msd, d_px2um*np.sqrt(8*msd/(len(pos_arr) - n_frames))
 
 class datasetError(Exception):
 	def __init__(self, msg):
@@ -176,9 +177,14 @@ class dataset:
 		with open(self.file) as file:
 			for line in file:
 				line = line.strip("\n").split(",")
+				'''
 				self.frames = np.vstack((self.frames, int(line[0])))
 				self.x_pos = np.vstack((self.x_pos, float(line[1])))
 				self.y_pos = np.vstack((self.y_pos, float(line[2])))
+				'''
+				self.frames = np.append(self.frames, int(line[0]))
+				self.x_pos = np.append(self.x_pos, float(line[1]))
+				self.y_pos = np.append(self.y_pos, float(line[2]))
 
 	#Not averaging anything
 	def displacement_histo(self, n, axis = 'x'):
